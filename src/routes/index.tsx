@@ -3,7 +3,6 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { AuthGuard } from '@/components/guards/AuthGuard';
 import { CourseList } from '@/domains/course/components/CourseList';
-import { CourseSortSelect } from '@/domains/course/components/CourseSortSelect';
 import { CourseDetailModal } from '@/domains/course/components/CourseDetailModal';
 import { CourseSortType } from '@/domains/course/types/course.types';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
@@ -11,6 +10,7 @@ import { useBatchEnroll } from '@/domains/course/hooks/useBatchEnroll';
 import { useToast } from '@/components/common/Toast';
 import { Button } from '@/components/common/Button';
 import { theme } from '@/styles/theme';
+import { CourseSortButtonGroup } from '@/domains/course/components/CourseSortButtonGroup';
 
 export const Route = createFileRoute('/')({
   component: IndexPage,
@@ -101,15 +101,20 @@ function IndexPage() {
             )}
           </HeaderRight>
         </Header>
+        {user?.role === 'INSTRUCTOR' && (
+          <NewCourseWrapper
+            style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}
+          >
+            {
+              <Link to="/courses/new">
+                <Button>강의 개설</Button>
+              </Link>
+            }
+          </NewCourseWrapper>
+        )}
 
         <Controls>
-          <CourseSortSelect value={sortType} onChange={setSortType} />
-
-          {user?.role === 'INSTRUCTOR' && (
-            <Link to="/courses/new">
-              <Button>강의 개설</Button>
-            </Link>
-          )}
+          <CourseSortButtonGroup value={sortType} onChange={setSortType} />
         </Controls>
 
         <CourseList
@@ -188,4 +193,10 @@ const FloatingButton = styled(Button)`
   width: calc(100% - ${theme.spacing.lg} * 2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 100;
+`;
+
+const NewCourseWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px;
 `;

@@ -3,7 +3,7 @@ import { Button } from '@/components/common/Button';
 import { CourseSortType } from '../types/course.types';
 import { theme } from '@/styles/theme';
 
-interface CourseSortSelectProps {
+interface CourseSortButtonGroupProps {
   value: CourseSortType;
   onChange: (value: CourseSortType) => void;
 }
@@ -14,7 +14,7 @@ const SORT_OPTIONS = [
   { value: 'rate' as const, label: '신청률 높은 순' },
 ];
 
-export function CourseSortSelect({ value, onChange }: CourseSortSelectProps) {
+export function CourseSortButtonGroup({ value, onChange }: CourseSortButtonGroupProps) {
   return (
     <Container>
       <Label>정렬 기준</Label>
@@ -53,5 +53,8 @@ const ButtonGroup = styled.div`
 
   > button {
     flex: 1;
+    min-height: ${theme.minTouchSize};
+    padding: ${theme.spacing.xs} ${theme.spacing.sm};
+    font-size: ${theme.fontSize.sm};
   }
 `;
