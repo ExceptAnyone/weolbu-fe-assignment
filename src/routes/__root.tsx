@@ -6,6 +6,7 @@ import { globalStyles } from '@/styles/globalStyles';
 import { queryClient } from '@/lib/queryClient';
 import { UserProvider } from '@/domains/user/context/UserContext';
 import { ToastProvider, ToastContainer } from '@/components/common/Toast';
+import { ModalProvider } from '@/components/common/Modal/ModalContext';
 import { MobileLayout } from '@/components/layout/MobileLayout';
 
 export const Route = createRootRoute({
@@ -16,13 +17,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <ToastProvider>
-          <Global styles={globalStyles} />
-          <MobileLayout>
-            <Outlet />
-          </MobileLayout>
-          <ToastContainer />
-        </ToastProvider>
+        <ModalProvider>
+          <ToastProvider>
+            <Global styles={globalStyles} />
+            <MobileLayout>
+              <Outlet />
+            </MobileLayout>
+            <ToastContainer />
+          </ToastProvider>
+        </ModalProvider>
       </UserProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

@@ -2,7 +2,8 @@ import { createContext, useContext, useState, ReactNode, useCallback } from 'rea
 
 interface ModalContextValue {
   isOpen: boolean;
-  openModal: () => void;
+  selectedCourseId: number | null;
+  openModal: (courseId?: number) => void;
   closeModal: () => void;
 }
 
@@ -10,12 +11,20 @@ const ModalContext = createContext<ModalContextValue | undefined>(undefined);
 
 export function ModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
-  const openModal = useCallback(() => setIsOpen(true), []);
-  const closeModal = useCallback(() => setIsOpen(false), []);
+  const openModal = useCallback((courseId?: number) => {
+    setIsOpen(true);
+    setSelectedCourseId(courseId ?? null);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsOpen(false);
+    setSelectedCourseId(null);
+  }, []);
 
   return (
-    <ModalContext.Provider value={{ isOpen, openModal, closeModal }}>
+    <ModalContext.Provider value={{ isOpen, selectedCourseId, openModal, closeModal }}>
       {children}
     </ModalContext.Provider>
   );
