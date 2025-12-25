@@ -33,7 +33,7 @@ export function CourseForm() {
     }
 
     const priceNum = Number(price);
-    const priceValidation = validateNumber(priceNum, 0, undefined, '가격');
+    const priceValidation = validateNumber(priceNum, 0, 1000000, '가격');
     if (!priceValidation.ok) {
       newErrors.price = priceValidation.reason;
     }
@@ -108,7 +108,8 @@ export function CourseForm() {
           placeholder="예) 200000"
           error={errors.price}
           min="0"
-          helperText="숫자만 입력하세요 (예: 200000)"
+          max="1000000"
+          helperText="백만원 이하로 입력하세요"
         />
       </FormFields>
 
