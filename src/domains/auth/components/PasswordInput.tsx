@@ -49,7 +49,7 @@ const PasswordContainer = styled.div`
 const ToggleButton = styled.button`
   position: absolute;
   right: ${theme.spacing.md};
-  top: calc(${theme.spacing.lg} + 20px); // label 높이 고려
+  top: calc(${theme.spacing.lg} + 10px); // label 높이 고려
 
   padding: ${theme.spacing.xs} ${theme.spacing.sm};
   font-size: ${theme.fontSize.sm};
