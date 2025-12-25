@@ -23,10 +23,10 @@ export function Button({
 const StyledButton = styled.button<{ variant: 'primary' | 'secondary'; fullWidth: boolean }>`
   /* 모바일 터치 친화적 크기 */
   min-height: ${theme.minTouchSize};
-  padding: ${theme.spacing.sm} ${theme.spacing.lg};
+  padding: ${theme.spacing.sm} ${theme.spacing.smPlus};
 
   /* 폰트 */
-  font-size: ${theme.fontSize.md};
+  font-size: ${theme.fontSize.sm};
   font-weight: ${theme.fontWeight.semibold};
 
   /* 테두리 */
