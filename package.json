@@ -8,7 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -22,17 +25,25 @@
     "@tanstack/react-query-devtools": "^5.91.1",
     "@tanstack/router-devtools": "^1.143.4",
     "@tanstack/router-vite-plugin": "^1.143.4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/ui": "^4.0.16",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.2",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "happy-dom": "^20.0.11",
+    "jsdom": "^27.3.0",
+    "msw": "^2.12.4",
     "prettier": "^3.3.2",
     "typescript": "^5.5.2",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "vitest": "^4.0.16"
   }
 }
