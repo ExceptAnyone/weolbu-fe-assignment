@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { AuthGuard } from '@/components/guards/AuthGuard';
 import { CourseList } from '@/domains/course/components/CourseList';
 import { CourseSortSelect } from '@/domains/course/components/CourseSortSelect';
+import { CourseDetailModal } from '@/domains/course/components/CourseDetailModal';
 import { CourseSortType } from '@/domains/course/types/course.types';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
 import { useBatchEnroll } from '@/domains/course/hooks/useBatchEnroll';
@@ -122,6 +123,8 @@ function IndexPage() {
             {isPending ? '신청 중...' : `선택한 강의 수강신청 (${selectedCourseIds.size})`}
           </FloatingButton>
         )}
+
+        <CourseDetailModal />
       </Container>
     </AuthGuard>
   );

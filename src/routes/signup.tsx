@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import styled from '@emotion/styled';
 import { AuthGuard } from '@/components/guards/AuthGuard';
 import { SignupForm } from '@/domains/auth/components/SignupForm';
-import { ModalProvider, useModal } from '@/components/common/Modal/ModalContext';
+import { useModal } from '@/components/common/Modal/ModalContext';
 import { Modal } from '@/components/common/Modal/Modal';
 import { LoginForm } from '@/domains/auth/components/LoginForm';
 import { Button } from '@/components/common/Button';
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/signup')({
   component: SignupPage,
 });
 
-function SignupPageContent() {
+function SignupPage() {
   const { openModal } = useModal();
 
   return (
@@ -20,7 +20,7 @@ function SignupPageContent() {
       <Container>
         <Header>
           <Title>회원가입</Title>
-          <Button variant="secondary" onClick={openModal}>
+          <Button variant="secondary" onClick={() => openModal()}>
             로그인
           </Button>
         </Header>
@@ -40,14 +40,6 @@ function SignupPageContent() {
         </Modal>
       </Container>
     </AuthGuard>
-  );
-}
-
-function SignupPage() {
-  return (
-    <ModalProvider>
-      <SignupPageContent />
-    </ModalProvider>
   );
 }
 

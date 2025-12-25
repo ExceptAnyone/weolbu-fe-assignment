@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/common/Checkbox';
 import { formatPrice } from '@/utils/format';
 import { theme } from '@/styles/theme';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
+import { useModal } from '@/components/common/Modal/ModalContext';
 
 interface CourseItemProps {
   course: Course;
@@ -13,14 +14,24 @@ interface CourseItemProps {
 
 export function CourseItem({ course, isSelected, onSelectChange }: CourseItemProps) {
   const { user } = useCurrentUser();
+  const { openModal } = useModal();
 
   // 강사는 체크박스를 보지 않음
   const showCheckbox = user?.role === 'STUDENT';
 
+  // 강의 카드 클릭 시 상세 모달 열기
+  const handleCardClick = (e: React.MouseEvent) => {
+    // 체크박스 클릭은 모달을 열지 않음
+    if ((e.target as HTMLElement).closest('[data-checkbox]')) {
+      return;
+    }
+    openModal(course.id);
+  };
+
   return (
-    <Container>
+    <Container onClick={handleCardClick}>
       {showCheckbox && (
-        <CheckboxWrapper>
+        <CheckboxWrapper data-checkbox>
           <Checkbox
             checked={isSelected}
             onChange={(e) => onSelectChange(course.id, e.target.checked)}
@@ -70,8 +81,12 @@ const Container = styled.div`
   gap: ${theme.spacing.md};
   align-items: flex-start;
 
+  cursor: pointer;
+
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
   }
 `;
 
