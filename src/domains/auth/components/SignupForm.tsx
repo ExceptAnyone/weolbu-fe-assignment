@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
+import { PhoneInput } from '@/components/common/PhoneInput';
 import { PasswordInput } from './PasswordInput';
 import { UserTypeSelector } from './UserTypeSelector';
 import { useSignup } from '../hooks/useSignup';
@@ -123,15 +124,13 @@ export function SignupForm() {
           error={errors.email}
         />
 
-        <Input
-          type="tel"
-          label="휴대폰 번호"
+        <PhoneInput
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(value) => setPhone(value)}
           onBlur={() => validateField('phone', phone)}
-          placeholder="010-0000-0000"
           error={errors.phone}
-          helperText="010-0000-0000 형식으로 입력해주세요"
+          placeholder="010-0000-0000"
+          label="휴대폰 번호"
         />
 
         <PasswordInput
