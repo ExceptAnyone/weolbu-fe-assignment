@@ -9,6 +9,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useToast } from '@/components/common/Toast';
 import { theme } from '@/styles/theme';
 import { useForm } from '@/hooks/useForm';
+import { ApiErrorResponse } from '@/domains/course/types/course.types';
 
 interface LoginFormValues {
   email: string;
@@ -30,12 +31,8 @@ export function LoginForm() {
       navigate({ to: '/' });
     },
     onError: (error: unknown) => {
-      const err = error as { response?: { status?: number; data?: { message?: string } } };
-      if (err.response?.status === 401) {
-        toast.error('이메일 또는 비밀번호가 올바르지 않습니다.');
-      } else {
-        toast.error(err.response?.data?.message || '로그인에 실패했습니다. 다시 시도해주세요.');
-      }
+      const err = error as ApiErrorResponse;
+      toast.error(err.message || '로그인에 실패했습니다. 다시 시도해주세요.');
     },
   });
 

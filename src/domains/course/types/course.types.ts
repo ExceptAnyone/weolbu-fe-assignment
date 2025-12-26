@@ -61,3 +61,10 @@ export interface BatchEnrollmentResponse {
     reason: string;
   }>;
 }
+
+// API 에러 응답 타입
+export interface ApiErrorResponse {
+  code: string;
+  message: string;
+  timestamp: string;
+}
