@@ -7,6 +7,7 @@ import { CourseDetailModal } from '@/domains/course/components/CourseDetailModal
 import { CourseSortType } from '@/domains/course/types/course.types';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
 import { useBatchEnroll } from '@/domains/course/hooks/useBatchEnroll';
+import { useEnrollCourse } from '@/domains/course/hooks/useEnrollCourse';
 import { useToast } from '@/components/common/Toast';
 import { Button } from '@/components/common/Button';
 import { theme } from '@/styles/theme';
@@ -22,7 +23,8 @@ function IndexPage() {
   const { user, logout } = useCurrentUser();
   const navigate = useNavigate();
   const toast = useToast();
-  const { mutate: batchEnroll, isPending } = useBatchEnroll();
+  const { mutate: batchEnroll, isPending: isBatchPending } = useBatchEnroll();
+  const { mutate: enrollCourse, isPending: isEnrollPending } = useEnrollCourse();
 
   const handleSelectChange = (courseId: number, checked: boolean) => {
     setSelectedCourseIds((prev) => {
@@ -42,13 +44,30 @@ function IndexPage() {
     navigate({ to: '/signup' });
   };
 
-  const handleBatchEnroll = () => {
+  const handleEnroll = () => {
     if (selectedCourseIds.size === 0) {
       toast.warning('수강신청할 강의를 선택해주세요.');
       return;
     }
 
     const courseIds = Array.from(selectedCourseIds);
+
+    // 단일 강의 수강신청
+    if (courseIds.length === 1) {
+      enrollCourse(courseIds[0], {
+        onSuccess: () => {
+          toast.success('강의 수강신청이 완료되었습니다!');
+          setSelectedCourseIds(new Set());
+        },
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
+          toast.error(err.response?.data?.message || '수강신청 중 오류가 발생했습니다.');
+        },
+      });
+      return;
+    }
+
+    // 복수 강의 일괄 수강신청
     batchEnroll(courseIds, {
       onSuccess: (response) => {
         const successCount = response.success.length;
@@ -126,8 +145,13 @@ function IndexPage() {
         </CourseListSection>
 
         {user?.role === 'STUDENT' && selectedCourseIds.size > 0 && (
-          <FloatingButton onClick={handleBatchEnroll} disabled={isPending}>
-            {isPending ? '신청 중...' : `선택한 강의 수강신청 (${selectedCourseIds.size})`}
+          <FloatingButton
+            onClick={handleEnroll}
+            disabled={isBatchPending || isEnrollPending}
+          >
+            {isBatchPending || isEnrollPending
+              ? '신청 중...'
+              : `선택한 강의 수강신청 (${selectedCourseIds.size})`}
           </FloatingButton>
         )}
 
