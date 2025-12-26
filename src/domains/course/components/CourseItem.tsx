@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/common/Checkbox';
 import { formatPrice } from '@/utils/format';
 import { theme } from '@/styles/theme';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
+import { useEnrolledCourses } from '../context/EnrolledCoursesContext';
 import { useModal } from '@/components/common/Modal/ModalContext';
 
 interface CourseItemProps {
@@ -14,10 +15,12 @@ interface CourseItemProps {
 
 export function CourseItem({ course, isSelected, onSelectChange }: CourseItemProps) {
   const { user } = useCurrentUser();
+  const { isEnrolled } = useEnrolledCourses();
   const { openModal } = useModal();
 
   // 강사는 체크박스를 보지 않음
   const showCheckbox = user?.role === 'STUDENT';
+  const enrolled = isEnrolled(course.id);
 
   // 강의 카드 클릭 시 상세 모달 열기
   const handleCardClick = (e: React.MouseEvent) => {
@@ -35,13 +38,16 @@ export function CourseItem({ course, isSelected, onSelectChange }: CourseItemPro
           <Checkbox
             checked={isSelected}
             onChange={(e) => onSelectChange(course.id, e.target.checked)}
-            disabled={course.isFull}
+            disabled={course.isFull || enrolled}
           />
         </CheckboxWrapper>
       )}
 
       <Content>
-        <Title>{course.title}</Title>
+        <TitleRow>
+          <Title>{course.title}</Title>
+          {enrolled && <EnrolledBadge>수강중</EnrolledBadge>}
+        </TitleRow>
 
         <InfoList>
           <InfoGroup>
@@ -103,11 +109,29 @@ const Content = styled.div`
   min-width: 0;
 `;
 
+const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.sm};
+`;
+
 const Title = styled.h3`
   font-size: ${theme.fontSize.lg};
   font-weight: ${theme.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin: 0;
+`;
+
+const EnrolledBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: ${theme.spacing.xs} ${theme.spacing.sm};
+  border-radius: ${theme.borderRadius.sm};
+  background-color: ${theme.colors.primary};
+  color: white;
+  font-size: ${theme.fontSize.xs};
+  font-weight: ${theme.fontWeight.medium};
+  white-space: nowrap;
 `;
 
 const InfoList = styled.dl`
