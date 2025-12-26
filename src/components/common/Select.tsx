@@ -15,18 +15,29 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export function Select({ label, options, error, id, ...props }: SelectProps) {
   const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  const errorId = `${selectId}-error`;
 
   return (
     <SelectContainer>
       {label && <Label htmlFor={selectId}>{label}</Label>}
-      <StyledSelect id={selectId} hasError={!!error} {...props}>
+      <StyledSelect
+        id={selectId}
+        hasError={!!error}
+        aria-describedby={error ? errorId : undefined}
+        aria-invalid={!!error}
+        {...props}
+      >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
       </StyledSelect>
-      {error && <ErrorText>{error}</ErrorText>}
+      {error && (
+        <ErrorText id={errorId} role="alert">
+          {error}
+        </ErrorText>
+      )}
     </SelectContainer>
   );
 }

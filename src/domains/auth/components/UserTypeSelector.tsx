@@ -9,8 +9,8 @@ interface UserTypeSelectorProps {
 
 export function UserTypeSelector({ value, onChange }: UserTypeSelectorProps) {
   return (
-    <Container>
-      <Label>회원 유형</Label>
+    <Fieldset>
+      <Legend>회원 유형</Legend>
       <RadioGroup>
         <RadioLabel>
           <input
@@ -33,20 +33,24 @@ export function UserTypeSelector({ value, onChange }: UserTypeSelectorProps) {
           <span>강사</span>
         </RadioLabel>
       </RadioGroup>
-    </Container>
+    </Fieldset>
   );
 }
 
-const Container = styled.div`
+const Fieldset = styled.fieldset`
+  border: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xs};
 `;
 
-const Label = styled.label`
+const Legend = styled.legend`
   font-size: ${theme.fontSize.sm};
   font-weight: ${theme.fontWeight.medium};
   color: ${theme.colors.text.primary};
+  padding: 0;
 `;
 
 const RadioGroup = styled.div`

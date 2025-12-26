@@ -10,13 +10,28 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ label, error, helperText, id, ...props }: InputProps) {
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  const errorId = `${inputId}-error`;
+  const helperId = `${inputId}-helper`;
+
+  // aria-describedby 설정: error가 있으면 error, 없으면 helperText
+  const describedBy = error ? errorId : helperText ? helperId : undefined;
 
   return (
     <InputContainer>
       {label && <Label htmlFor={inputId}>{label}</Label>}
-      <StyledInput id={inputId} hasError={!!error} {...props} />
-      {error && <ErrorText>{error}</ErrorText>}
-      {helperText && !error && <HelperText>{helperText}</HelperText>}
+      <StyledInput
+        id={inputId}
+        hasError={!!error}
+        aria-describedby={describedBy}
+        aria-invalid={!!error}
+        {...props}
+      />
+      {error && (
+        <ErrorText id={errorId} role="alert">
+          {error}
+        </ErrorText>
+      )}
+      {helperText && !error && <HelperText id={helperId}>{helperText}</HelperText>}
     </InputContainer>
   );
 }

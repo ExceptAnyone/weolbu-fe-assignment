@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react';
+import styled from '@emotion/styled';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { useMutation } from '@tanstack/react-query';
@@ -7,6 +8,7 @@ import { useCurrentUser } from '@/domains/user/context/UserContext';
 import { useModal } from '@/components/common/Modal/ModalContext';
 import { useNavigate } from '@tanstack/react-router';
 import { useToast } from '@/components/common/Toast';
+import { theme } from '@/styles/theme';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -40,24 +42,55 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Input
-        type="email"
-        label="이메일"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="example@email.com"
-      />
-      <Input
-        type="password"
-        label="비밀번호"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="비밀번호"
-      />
+    <Form onSubmit={handleSubmit}>
+      <Fieldset>
+        <Legend>로그인 정보</Legend>
+        <FormFields>
+          <Input
+            type="email"
+            label="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="example@email.com"
+          />
+          <Input
+            type="password"
+            label="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호"
+          />
+        </FormFields>
+      </Fieldset>
       <Button type="submit" fullWidth disabled={!email || !password || isPending}>
         {isPending ? '로그인 중...' : '로그인'}
       </Button>
-    </form>
+    </Form>
   );
 }
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.lg};
+`;
+
+const Fieldset = styled.fieldset`
+  border: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const Legend = styled.legend`
+  font-size: ${theme.fontSize.lg};
+  font-weight: ${theme.fontWeight.semibold};
+  color: ${theme.colors.text.primary};
+  margin-bottom: ${theme.spacing.md};
+  padding: 0;
+`;
+
+const FormFields = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.lg};
+`;
