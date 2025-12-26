@@ -1,4 +1,3 @@
-import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
@@ -9,17 +8,21 @@ import { useModal } from '@/components/common/Modal/ModalContext';
 import { useNavigate } from '@tanstack/react-router';
 import { useToast } from '@/components/common/Toast';
 import { theme } from '@/styles/theme';
+import { useForm } from '@/hooks/useForm';
+
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const { login } = useCurrentUser();
   const { closeModal } = useModal();
   const navigate = useNavigate();
   const toast = useToast();
 
   const { mutate: loginMutation, isPending } = useMutation({
-    mutationFn: () => authApi.login({ email, password }),
+    mutationFn: (values: LoginFormValues) => authApi.login(values),
     onSuccess: (response) => {
       login(response.user, response.accessToken);
       closeModal();
@@ -36,33 +39,38 @@ export function LoginForm() {
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    loginMutation();
-  };
+  const form = useForm<LoginFormValues>({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: (values) => {
+      loginMutation(values);
+    },
+  });
+
+  const isFormValid = form.values.email && form.values.password;
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={form.handleSubmit}>
       <Fieldset>
         <Legend>로그인 정보</Legend>
         <FormFields>
           <Input
             type="email"
             label="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            {...form.getFieldProps('email')}
             placeholder="example@email.com"
           />
           <Input
             type="password"
             label="비밀번호"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            {...form.getFieldProps('password')}
             placeholder="비밀번호"
           />
         </FormFields>
       </Fieldset>
-      <Button type="submit" fullWidth disabled={!email || !password || isPending}>
+      <Button type="submit" fullWidth disabled={!isFormValid || isPending}>
         {isPending ? '로그인 중...' : '로그인'}
       </Button>
     </Form>

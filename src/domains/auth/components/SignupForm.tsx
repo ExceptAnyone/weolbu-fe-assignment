@@ -1,4 +1,3 @@
-import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
@@ -14,93 +13,60 @@ import {
   validatePhone,
 } from '@/utils/validation';
 import { theme } from '@/styles/theme';
+import { useForm } from '@/hooks/useForm';
+
+interface SignupFormValues {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+  role: UserRole;
+}
 
 export function SignupForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<UserRole>('STUDENT');
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
   const { mutate: signup, isPending } = useSignup();
 
-  // 실시간 필드 검증
-  const validateField = (field: string, value: string) => {
-    let result;
-    switch (field) {
-      case 'email':
-        result = validateEmail(value);
-        break;
-      case 'password':
-        result = validatePassword(value);
-        break;
-      case 'name':
-        result = validateName(value);
-        break;
-      case 'phone':
-        result = validatePhone(value);
-        break;
-      default:
-        return;
-    }
+  const form = useForm<SignupFormValues>({
+    initialValues: {
+      email: '',
+      password: '',
+      name: '',
+      phone: '',
+      role: 'STUDENT',
+    },
+    validateOnBlur: true,
+    validate: (values) => {
+      const errors: Partial<Record<keyof SignupFormValues, string>> = {};
 
-    setErrors((prev) => ({
-      ...prev,
-      [field]: result.ok ? '' : result.reason,
-    }));
-  };
+      const emailValidation = validateEmail(values.email);
+      if (!emailValidation.ok) errors.email = emailValidation.reason;
 
-  // 전체 폼 검증
-  const validateForm = (): boolean => {
-    const emailValidation = validateEmail(email);
-    const passwordValidation = validatePassword(password);
-    const nameValidation = validateName(name);
-    const phoneValidation = validatePhone(phone);
+      const passwordValidation = validatePassword(values.password);
+      if (!passwordValidation.ok) errors.password = passwordValidation.reason;
 
-    const newErrors: Record<string, string> = {};
+      const nameValidation = validateName(values.name);
+      if (!nameValidation.ok) errors.name = nameValidation.reason;
 
-    if (!emailValidation.ok) newErrors.email = emailValidation.reason;
-    if (!passwordValidation.ok) newErrors.password = passwordValidation.reason;
-    if (!nameValidation.ok) newErrors.name = nameValidation.reason;
-    if (!phoneValidation.ok) newErrors.phone = phoneValidation.reason;
+      const phoneValidation = validatePhone(values.phone);
+      if (!phoneValidation.ok) errors.phone = phoneValidation.reason;
 
-    setErrors(newErrors);
+      return errors;
+    },
+    onSubmit: (values) => {
+      signup(values);
+    },
+  });
 
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // 폼 제출
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    signup({
-      email,
-      password,
-      name,
-      phone,
-      role,
-    });
-  };
-
-  // 가입 버튼 활성화 조건: 모든 필드가 입력되고 에러가 없어야 함
+  // 가입 버튼 활성화 조건
   const isFormValid =
-    email &&
-    password &&
-    name &&
-    phone &&
-    !errors.email &&
-    !errors.password &&
-    !errors.name &&
-    !errors.phone;
+    form.values.email &&
+    form.values.password &&
+    form.values.name &&
+    form.values.phone &&
+    !Object.keys(form.errors).some((key) => form.errors[key as keyof SignupFormValues]);
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={form.handleSubmit}>
       <Title>회원가입</Title>
 
       <Fieldset>
@@ -109,42 +75,38 @@ export function SignupForm() {
           <Input
             type="text"
             label="이름"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={() => validateField('name', name)}
+            {...form.getFieldProps('name')}
             placeholder="이름을 입력하세요"
-            error={errors.name}
+            error={form.touched.name ? form.errors.name : ''}
           />
 
           <Input
             type="email"
             label="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={() => validateField('email', email)}
+            {...form.getFieldProps('email')}
             placeholder="example@email.com"
-            error={errors.email}
+            error={form.touched.email ? form.errors.email : ''}
           />
 
           <PhoneInput
-            value={phone}
-            onChange={(value) => setPhone(value)}
-            onBlur={() => validateField('phone', phone)}
-            error={errors.phone}
-            placeholder="010-0000-0000"
             label="휴대폰 번호"
+            value={form.values.phone}
+            onChange={(value) => form.handleChange('phone')(value)}
+            onBlur={form.handleBlur('phone')}
+            error={form.touched.phone ? form.errors.phone : ''}
+            placeholder="010-0000-0000"
           />
 
           <PasswordInput
-            value={password}
-            onChange={(value) => {
-              setPassword(value);
-              if (value) validateField('password', value);
-            }}
-            error={errors.password}
+            value={form.values.password}
+            onChange={(value) => form.handleChange('password')(value)}
+            error={form.touched.password ? form.errors.password : ''}
           />
 
-          <UserTypeSelector value={role} onChange={setRole} />
+          <UserTypeSelector
+            value={form.values.role}
+            onChange={(value) => form.setFieldValue('role', value)}
+          />
         </FormFields>
       </Fieldset>
 

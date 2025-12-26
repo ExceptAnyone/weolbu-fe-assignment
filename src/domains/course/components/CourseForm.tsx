@@ -1,4 +1,3 @@
-import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
@@ -6,69 +5,72 @@ import { useCreateCourse } from '../hooks/useCreateCourse';
 import { validateNumber } from '@/utils/validation';
 import { theme } from '@/styles/theme';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
+import { useForm } from '@/hooks/useForm';
+
+interface CourseFormValues {
+  title: string;
+  description: string;
+  maxStudents: string;
+  price: string;
+}
 
 export function CourseForm() {
   const { user } = useCurrentUser();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [maxStudents, setMaxStudents] = useState('');
-  const [price, setPrice] = useState('');
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
   const { mutate: createCourse, isPending } = useCreateCourse();
 
-  // 폼 검증
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+  const form = useForm<CourseFormValues>({
+    initialValues: {
+      title: '',
+      description: '',
+      maxStudents: '',
+      price: '',
+    },
+    validate: (values) => {
+      const errors: Partial<Record<keyof CourseFormValues, string>> = {};
 
-    if (!title || title.trim() === '') {
-      newErrors.title = '강의명을 입력해주세요.';
-    }
+      if (!values.title || values.title.trim() === '') {
+        errors.title = '강의명을 입력해주세요.';
+      }
 
-    const maxStudentsNum = Number(maxStudents);
-    const maxStudentsValidation = validateNumber(maxStudentsNum, 1, 100, '최대 수강 인원');
-    if (!maxStudentsValidation.ok) {
-      newErrors.maxStudents = maxStudentsValidation.reason;
-    }
+      const maxStudentsNum = Number(values.maxStudents);
+      const maxStudentsValidation = validateNumber(maxStudentsNum, 1, 100, '최대 수강 인원');
+      if (!maxStudentsValidation.ok) {
+        errors.maxStudents = maxStudentsValidation.reason;
+      }
 
-    const priceNum = Number(price);
-    const priceValidation = validateNumber(priceNum, 0, 1000000, '가격');
-    if (!priceValidation.ok) {
-      newErrors.price = priceValidation.reason;
-    }
+      const priceNum = Number(values.price);
+      const priceValidation = validateNumber(priceNum, 0, 1000000, '가격');
+      if (!priceValidation.ok) {
+        errors.price = priceValidation.reason;
+      }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+      return errors;
+    },
+    onSubmit: (values) => {
+      if (!user) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
 
-  // 폼 제출
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    if (!user) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-
-    createCourse({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      instructorName: user.name,
-      maxStudents: Number(maxStudents),
-      price: Number(price),
-    });
-  };
+      createCourse({
+        title: values.title.trim(),
+        description: values.description.trim() || undefined,
+        instructorName: user.name,
+        maxStudents: Number(values.maxStudents),
+        price: Number(values.price),
+      });
+    },
+  });
 
   // 등록 버튼 활성화 조건
-  const isFormValid = title && maxStudents && price && !Object.keys(errors).length;
+  const isFormValid =
+    form.values.title &&
+    form.values.maxStudents &&
+    form.values.price &&
+    !Object.keys(form.errors).some((key) => form.errors[key as keyof CourseFormValues]);
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={form.handleSubmit}>
       <Title>강의 개설</Title>
 
       <Fieldset>
@@ -77,27 +79,24 @@ export function CourseForm() {
           <Input
             type="text"
             label="강의명"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...form.getFieldProps('title')}
             placeholder="예) 너나위의 내집마련 기초반"
-            error={errors.title}
+            error={form.touched.title ? form.errors.title : ''}
           />
 
           <Input
             type="text"
             label="강의 설명 (선택)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            {...form.getFieldProps('description')}
             placeholder="강의에 대한 간단한 설명을 입력하세요"
           />
 
           <Input
             type="number"
             label="최대 수강 인원"
-            value={maxStudents}
-            onChange={(e) => setMaxStudents(e.target.value)}
+            {...form.getFieldProps('maxStudents')}
             placeholder="예) 10"
-            error={errors.maxStudents}
+            error={form.touched.maxStudents ? form.errors.maxStudents : ''}
             min="1"
             max="100"
           />
@@ -105,10 +104,9 @@ export function CourseForm() {
           <Input
             type="number"
             label="가격 (원)"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            {...form.getFieldProps('price')}
             placeholder="예) 200000"
-            error={errors.price}
+            error={form.touched.price ? form.errors.price : ''}
             min="0"
             max="1000000"
             helperText="백만원 이하로 입력하세요"
