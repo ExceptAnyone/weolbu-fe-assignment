@@ -52,15 +52,16 @@ export function CourseList({ sortType, selectedCourseIds, onSelectChange }: Cour
   }
 
   return (
-    <Container>
+    <Container as="ul">
       {data.pages.map((page) =>
         page.content.map((course) => (
-          <CourseItem
-            key={course.id}
-            course={course}
-            isSelected={selectedCourseIds.has(course.id)}
-            onSelectChange={onSelectChange}
-          />
+          <ListItem key={course.id}>
+            <CourseItem
+              course={course}
+              isSelected={selectedCourseIds.has(course.id)}
+              onSelectChange={onSelectChange}
+            />
+          </ListItem>
         ))
       )}
 
@@ -78,7 +79,11 @@ const Container = styled.div`
   flex-direction: column;
   gap: ${theme.spacing.md};
   padding: ${theme.spacing.md};
+  list-style: none;
+  margin: 0;
 `;
+
+const ListItem = styled.li``;
 
 const Observer = styled.div`
   height: 20px;

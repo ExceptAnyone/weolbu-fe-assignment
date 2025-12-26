@@ -17,7 +17,7 @@ function SignupPage() {
 
   return (
     <AuthGuard requireAuth={false} redirectTo="/">
-      <Container>
+      <Container as="main">
         <Header>
           <Title>회원가입</Title>
           <Button variant="secondary" onClick={() => openModal()}>
@@ -25,7 +25,7 @@ function SignupPage() {
           </Button>
         </Header>
 
-        <FormWrapper>
+        <FormWrapper as="section">
           <SignupForm />
         </FormWrapper>
 

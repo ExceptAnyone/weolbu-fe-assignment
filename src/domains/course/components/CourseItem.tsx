@@ -29,7 +29,7 @@ export function CourseItem({ course, isSelected, onSelectChange }: CourseItemPro
   };
 
   return (
-    <Container onClick={handleCardClick}>
+    <Container as="article" onClick={handleCardClick}>
       {showCheckbox && (
         <CheckboxWrapper data-checkbox>
           <Checkbox
@@ -43,29 +43,29 @@ export function CourseItem({ course, isSelected, onSelectChange }: CourseItemPro
       <Content>
         <Title>{course.title}</Title>
 
-        <InfoGrid>
-          <InfoItem>
-            <InfoLabel>강사</InfoLabel>
-            <InfoValue>{course.instructorName}</InfoValue>
-          </InfoItem>
+        <InfoList>
+          <InfoGroup>
+            <InfoTerm>강사</InfoTerm>
+            <InfoDescription>{course.instructorName}</InfoDescription>
+          </InfoGroup>
 
-          <InfoItem>
-            <InfoLabel>수강 인원</InfoLabel>
-            <InfoValue>
+          <InfoGroup>
+            <InfoTerm>수강 인원</InfoTerm>
+            <InfoDescription>
               {course.currentStudents}명 / {course.maxStudents}명
-            </InfoValue>
-          </InfoItem>
+            </InfoDescription>
+          </InfoGroup>
 
-          <InfoItem>
-            <InfoLabel>가격</InfoLabel>
-            <InfoValue>{formatPrice(course.price)}</InfoValue>
-          </InfoItem>
+          <InfoGroup>
+            <InfoTerm>가격</InfoTerm>
+            <InfoDescription>{formatPrice(course.price)}</InfoDescription>
+          </InfoGroup>
 
-          <InfoItem>
-            <InfoLabel>남은 자리</InfoLabel>
-            <InfoValue>{course.availableSeats}명</InfoValue>
-          </InfoItem>
-        </InfoGrid>
+          <InfoGroup>
+            <InfoTerm>남은 자리</InfoTerm>
+            <InfoDescription>{course.availableSeats}명</InfoDescription>
+          </InfoGroup>
+        </InfoList>
       </Content>
     </Container>
   );
@@ -110,25 +110,27 @@ const Title = styled.h3`
   margin: 0;
 `;
 
-const InfoGrid = styled.div`
+const InfoList = styled.dl`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: ${theme.spacing.sm};
+  margin: 0;
 `;
 
-const InfoItem = styled.div`
+const InfoGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.xs};
 `;
 
-const InfoLabel = styled.span`
+const InfoTerm = styled.dt`
   font-size: ${theme.fontSize.xs};
   color: ${theme.colors.text.secondary};
 `;
 
-const InfoValue = styled.span`
+const InfoDescription = styled.dd`
   font-size: ${theme.fontSize.md};
   color: ${theme.colors.text.primary};
   font-weight: ${theme.fontWeight.medium};
+  margin: 0;
 `;

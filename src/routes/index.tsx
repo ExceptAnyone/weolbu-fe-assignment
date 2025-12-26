@@ -84,7 +84,7 @@ function IndexPage() {
 
   return (
     <AuthGuard requireAuth={true} redirectTo="/signup">
-      <Container>
+      <Container as="main">
         <Header>
           <Title>강의 목록</Title>
 
@@ -113,15 +113,17 @@ function IndexPage() {
           </NewCourseWrapper>
         )}
 
-        <Controls>
+        <Controls as="nav">
           <CourseSortButtonGroup value={sortType} onChange={setSortType} />
         </Controls>
 
-        <CourseList
-          sortType={sortType}
-          selectedCourseIds={selectedCourseIds}
-          onSelectChange={handleSelectChange}
-        />
+        <CourseListSection>
+          <CourseList
+            sortType={sortType}
+            selectedCourseIds={selectedCourseIds}
+            onSelectChange={handleSelectChange}
+          />
+        </CourseListSection>
 
         {user?.role === 'STUDENT' && selectedCourseIds.size > 0 && (
           <FloatingButton onClick={handleBatchEnroll} disabled={isPending}>
@@ -183,6 +185,8 @@ const Controls = styled.div`
     flex: 0 0 auto;
   }
 `;
+
+const CourseListSection = styled.section``;
 
 const FloatingButton = styled(Button)`
   position: fixed;

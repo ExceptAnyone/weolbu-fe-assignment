@@ -22,7 +22,13 @@ export function Modal({ children }: ModalProps) {
 
   return (
     <Overlay onClick={closeModal}>
-      <ModalContainer onClick={(e) => e.stopPropagation()}>{children}</ModalContainer>
+      <ModalContainer
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </ModalContainer>
     </Overlay>
   );
 }
