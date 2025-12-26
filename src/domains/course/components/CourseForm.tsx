@@ -71,47 +71,50 @@ export function CourseForm() {
     <Form onSubmit={handleSubmit}>
       <Title>강의 개설</Title>
 
-      <FormFields>
-        <Input
-          type="text"
-          label="강의명"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="예) 너나위의 내집마련 기초반"
-          error={errors.title}
-        />
+      <Fieldset>
+        <Legend>강의 정보</Legend>
+        <FormFields>
+          <Input
+            type="text"
+            label="강의명"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="예) 너나위의 내집마련 기초반"
+            error={errors.title}
+          />
 
-        <Input
-          type="text"
-          label="강의 설명 (선택)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="강의에 대한 간단한 설명을 입력하세요"
-        />
+          <Input
+            type="text"
+            label="강의 설명 (선택)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="강의에 대한 간단한 설명을 입력하세요"
+          />
 
-        <Input
-          type="number"
-          label="최대 수강 인원"
-          value={maxStudents}
-          onChange={(e) => setMaxStudents(e.target.value)}
-          placeholder="예) 10"
-          error={errors.maxStudents}
-          min="1"
-          max="100"
-        />
+          <Input
+            type="number"
+            label="최대 수강 인원"
+            value={maxStudents}
+            onChange={(e) => setMaxStudents(e.target.value)}
+            placeholder="예) 10"
+            error={errors.maxStudents}
+            min="1"
+            max="100"
+          />
 
-        <Input
-          type="number"
-          label="가격 (원)"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="예) 200000"
-          error={errors.price}
-          min="0"
-          max="1000000"
-          helperText="백만원 이하로 입력하세요"
-        />
-      </FormFields>
+          <Input
+            type="number"
+            label="가격 (원)"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="예) 200000"
+            error={errors.price}
+            min="0"
+            max="1000000"
+            helperText="백만원 이하로 입력하세요"
+          />
+        </FormFields>
+      </Fieldset>
 
       <Button type="submit" fullWidth disabled={!isFormValid || isPending}>
         {isPending ? '등록 중...' : '등록하기'}
@@ -135,6 +138,20 @@ const Title = styled.h1`
   color: ${theme.colors.text.primary};
   text-align: center;
   margin-bottom: ${theme.spacing.md};
+`;
+
+const Fieldset = styled.fieldset`
+  border: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const Legend = styled.legend`
+  font-size: ${theme.fontSize.lg};
+  font-weight: ${theme.fontWeight.semibold};
+  color: ${theme.colors.text.primary};
+  margin-bottom: ${theme.spacing.md};
+  padding: 0;
 `;
 
 const FormFields = styled.div`

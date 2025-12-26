@@ -103,47 +103,50 @@ export function SignupForm() {
     <Form onSubmit={handleSubmit}>
       <Title>회원가입</Title>
 
-      <FormFields>
-        <Input
-          type="text"
-          label="이름"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={() => validateField('name', name)}
-          placeholder="이름을 입력하세요"
-          error={errors.name}
-        />
+      <Fieldset>
+        <Legend>기본 정보</Legend>
+        <FormFields>
+          <Input
+            type="text"
+            label="이름"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => validateField('name', name)}
+            placeholder="이름을 입력하세요"
+            error={errors.name}
+          />
 
-        <Input
-          type="email"
-          label="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onBlur={() => validateField('email', email)}
-          placeholder="example@email.com"
-          error={errors.email}
-        />
+          <Input
+            type="email"
+            label="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => validateField('email', email)}
+            placeholder="example@email.com"
+            error={errors.email}
+          />
 
-        <PhoneInput
-          value={phone}
-          onChange={(value) => setPhone(value)}
-          onBlur={() => validateField('phone', phone)}
-          error={errors.phone}
-          placeholder="010-0000-0000"
-          label="휴대폰 번호"
-        />
+          <PhoneInput
+            value={phone}
+            onChange={(value) => setPhone(value)}
+            onBlur={() => validateField('phone', phone)}
+            error={errors.phone}
+            placeholder="010-0000-0000"
+            label="휴대폰 번호"
+          />
 
-        <PasswordInput
-          value={password}
-          onChange={(value) => {
-            setPassword(value);
-            if (value) validateField('password', value);
-          }}
-          error={errors.password}
-        />
+          <PasswordInput
+            value={password}
+            onChange={(value) => {
+              setPassword(value);
+              if (value) validateField('password', value);
+            }}
+            error={errors.password}
+          />
 
-        <UserTypeSelector value={role} onChange={setRole} />
-      </FormFields>
+          <UserTypeSelector value={role} onChange={setRole} />
+        </FormFields>
+      </Fieldset>
 
       <Button type="submit" fullWidth disabled={!isFormValid || isPending}>
         {isPending ? '가입 중...' : '가입하기'}
@@ -167,6 +170,20 @@ const Title = styled.h1`
   color: ${theme.colors.text.primary};
   text-align: center;
   margin-bottom: ${theme.spacing.md};
+`;
+
+const Fieldset = styled.fieldset`
+  border: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const Legend = styled.legend`
+  font-size: ${theme.fontSize.lg};
+  font-weight: ${theme.fontWeight.semibold};
+  color: ${theme.colors.text.primary};
+  margin-bottom: ${theme.spacing.md};
+  padding: 0;
 `;
 
 const FormFields = styled.div`
