@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { AuthGuard } from '@/components/guards/AuthGuard';
 import { CourseList } from '@/domains/course/components/CourseList';
 import { CourseDetailModal } from '@/domains/course/components/CourseDetailModal';
-import { CourseSortType } from '@/domains/course/types/course.types';
+import { CourseSortType, ApiErrorResponse } from '@/domains/course/types/course.types';
 import { useCurrentUser } from '@/domains/user/context/UserContext';
 import { useBatchEnroll } from '@/domains/course/hooks/useBatchEnroll';
 import { useEnrollCourse } from '@/domains/course/hooks/useEnrollCourse';
@@ -16,6 +16,8 @@ import { CourseSortButtonGroup } from '@/domains/course/components/CourseSortBut
 export const Route = createFileRoute('/')({
   component: IndexPage,
 });
+
+const TOAST_DISPLAY_DELAY_MS = 100;
 
 function IndexPage() {
   const [sortType, setSortType] = useState<CourseSortType>('recent');
@@ -44,30 +46,22 @@ function IndexPage() {
     navigate({ to: '/signup' });
   };
 
-  const handleEnroll = () => {
-    if (selectedCourseIds.size === 0) {
-      toast.warning('수강신청할 강의를 선택해주세요.');
-      return;
-    }
+  // 단일 강의 수강신청
+  const handleSingleEnroll = (courseId: number) => {
+    enrollCourse(courseId, {
+      onSuccess: () => {
+        toast.success('강의 수강신청이 완료되었습니다!');
+        setSelectedCourseIds(new Set());
+      },
+      onError: (error: unknown) => {
+        const err = error as ApiErrorResponse;
+        toast.error(err.message || '수강신청 중 오류가 발생했습니다.');
+      },
+    });
+  };
 
-    const courseIds = Array.from(selectedCourseIds);
-
-    // 단일 강의 수강신청
-    if (courseIds.length === 1) {
-      enrollCourse(courseIds[0], {
-        onSuccess: () => {
-          toast.success('강의 수강신청이 완료되었습니다!');
-          setSelectedCourseIds(new Set());
-        },
-        onError: (error: unknown) => {
-          const err = error as { response?: { data?: { message?: string } } };
-          toast.error(err.response?.data?.message || '수강신청 중 오류가 발생했습니다.');
-        },
-      });
-      return;
-    }
-
-    // 복수 강의 일괄 수강신청
+  // 복수 강의 일괄 수강신청
+  const handleBatchEnroll = (courseIds: number[]) => {
     batchEnroll(courseIds, {
       onSuccess: (response) => {
         const successCount = response.success.length;
@@ -81,24 +75,39 @@ function IndexPage() {
           toast.error(`수강신청에 실패했습니다.`);
           // 실패 이유를 순차적으로 표시
           response.failed.forEach((f) => {
-            setTimeout(() => toast.error(f.reason), 100);
+            setTimeout(() => toast.error(f.reason), TOAST_DISPLAY_DELAY_MS);
           });
         } else {
           // 부분 성공
           toast.warning(`${successCount}개 성공, ${failCount}개 실패했습니다.`);
           // 실패한 강의 이유 표시
           response.failed.forEach((f) => {
-            setTimeout(() => toast.error(f.reason), 100);
+            setTimeout(() => toast.error(f.reason), TOAST_DISPLAY_DELAY_MS);
           });
         }
 
         setSelectedCourseIds(new Set());
       },
       onError: (error: unknown) => {
-        const err = error as { response?: { data?: { message?: string } } };
-        toast.error(err.response?.data?.message || '수강신청 중 오류가 발생했습니다.');
+        const err = error as ApiErrorResponse;
+        toast.error(err.message || '수강신청 중 오류가 발생했습니다.');
       },
     });
+  };
+
+  const handleEnroll = () => {
+    if (selectedCourseIds.size === 0) {
+      toast.warning('수강신청할 강의를 선택해주세요.');
+      return;
+    }
+
+    const courseIds = Array.from(selectedCourseIds);
+
+    if (courseIds.length === 1) {
+      handleSingleEnroll(courseIds[0]);
+    } else {
+      handleBatchEnroll(courseIds);
+    }
   };
 
   return (
@@ -121,14 +130,10 @@ function IndexPage() {
           </HeaderRight>
         </Header>
         {user?.role === 'INSTRUCTOR' && (
-          <NewCourseWrapper
-            style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px' }}
-          >
-            {
-              <Link to="/courses/new">
-                <Button>강의 개설</Button>
-              </Link>
-            }
+          <NewCourseWrapper>
+            <Link to="/courses/new">
+              <Button>강의 개설</Button>
+            </Link>
           </NewCourseWrapper>
         )}
 
@@ -145,10 +150,7 @@ function IndexPage() {
         </CourseListSection>
 
         {user?.role === 'STUDENT' && selectedCourseIds.size > 0 && (
-          <FloatingButton
-            onClick={handleEnroll}
-            disabled={isBatchPending || isEnrollPending}
-          >
+          <FloatingButton onClick={handleEnroll} disabled={isBatchPending || isEnrollPending}>
             {isBatchPending || isEnrollPending
               ? '신청 중...'
               : `선택한 강의 수강신청 (${selectedCourseIds.size})`}
@@ -226,5 +228,5 @@ const FloatingButton = styled(Button)`
 const NewCourseWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
-  padding: 16px;
+  padding: ${theme.spacing.lg};
 `;
